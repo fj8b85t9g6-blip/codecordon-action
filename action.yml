@@ -42,15 +42,21 @@ runs:
         fi
 
         CLI_DIR="$RUNNER_TEMP/codecordon-cli-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}"
-        npm install --prefix "$CLI_DIR" --no-save --ignore-scripts \
-          https://github.com/fj8b85t9g6-blip/codecordon-cli/releases/download/v0.2.1/codecordon-0.2.1.tgz
+        CLI_TARBALL="$RUNNER_TEMP/codecordon-0.3.0.tgz"
+        curl --fail --silent --show-error --location \
+          https://github.com/fj8b85t9g6-blip/codecordon-cli/releases/download/v0.3.0/codecordon-0.3.0.tgz \
+          --output "$CLI_TARBALL"
+        printf '%s  %s\n' \
+          'a8152aac4210c55996d1a4eed2ec06e8cc47b457ddfbf665b32a3d46384f13e2' \
+          "$CLI_TARBALL" | sha256sum --check --status
+        npm install --prefix "$CLI_DIR" --no-save --ignore-scripts "$CLI_TARBALL"
 
         CHANNEL_SHIM="$RUNNER_TEMP/codecordon-channel-${GITHUB_RUN_ID:-local}.cjs"
         printf '%s\n' \
           'const originalFetch = globalThis.fetch;' \
           'globalThis.fetch = (input, init = {}) => {' \
           '  const headers = new Headers(init.headers);' \
-          '  headers.set("X-CodeCordon-Client", "github-action/1.0");' \
+          '  headers.set("X-CodeCordon-Client", "github-action/1.2.0");' \
           '  headers.set("X-CodeCordon-Channel", "github_action");' \
           '  return originalFetch(input, { ...init, headers });' \
           '};' > "$CHANNEL_SHIM"

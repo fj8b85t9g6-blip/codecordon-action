@@ -4,11 +4,17 @@ Add a deterministic security check for AI-generated and vibe-coded applications 
 
 CodeCordon reports exact files, lines, and suggested fixes for known patterns involving hardcoded secrets, missing authentication, injection, unsafe LLM usage, insecure configuration, and web security mistakes. A passing result means no configured known-pattern gate failed; it is **not** a security certification or penetration test.
 
-The action installs the reviewed public [CodeCordon CLI `v0.2.1` release](https://github.com/fj8b85t9g6-blip/codecordon-cli/releases/tag/v0.2.1), rather than executing code from the private hosted application repository.
+The action installs the checksum-verified public [CodeCordon CLI `v0.3.0` release](https://github.com/fj8b85t9g6-blip/codecordon-cli/releases/tag/v0.3.0), rather than executing code from the private hosted application repository.
 
 ## Try the scanner first
 
-Scan any public GitHub repository without an account:
+Scan any public GitHub repository without an account from an interactive terminal:
+
+```bash
+npx --yes --package=https://github.com/fj8b85t9g6-blip/codecordon-cli/releases/download/v0.3.0/codecordon-0.3.0.tgz codecordon scan https://github.com/owner/repo
+```
+
+The free preview is public-repository-only, expires after 24 hours, and is limited to three scans per hour. Local-folder and CI scans require CodeCordon Pro.
 
 **[Run a free public-repository scan](https://codecordon.up.railway.app/?utm_source=github&utm_medium=action_repo&utm_campaign=public_action)**
 
