@@ -4,6 +4,8 @@ Add a deterministic security check for AI-generated and vibe-coded applications 
 
 CodeCordon reports exact files, lines, and suggested fixes for known patterns involving hardcoded secrets, missing authentication, injection, unsafe LLM usage, insecure configuration, and web security mistakes. A passing result means no configured known-pattern gate failed; it is **not** a security certification or penetration test.
 
+The action installs the reviewed public [CodeCordon CLI `v0.2.1` release](https://github.com/fj8b85t9g6-blip/codecordon-cli/releases/tag/v0.2.1), rather than executing code from the private hosted application repository.
+
 ## Try the scanner first
 
 Scan any public GitHub repository without an account:

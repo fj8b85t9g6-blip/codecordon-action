@@ -22,5 +22,6 @@ jobs:
         run: |
           set -euo pipefail
           CLI_DIR="$RUNNER_TEMP/codecordon-cli"
-          npm install --prefix "$CLI_DIR" --no-save --ignore-scripts codecordon@0.2.0
-          test "$(node "$CLI_DIR/node_modules/codecordon/bin/codecordon.js" --version)" = "0.2.0"
+          npm install --prefix "$CLI_DIR" --no-save --ignore-scripts \
+            https://github.com/fj8b85t9g6-blip/codecordon-cli/releases/download/v0.2.1/codecordon-0.2.1.tgz
+          test "$(node "$CLI_DIR/node_modules/codecordon/bin/codecordon.js" --version)" = "0.2.1"

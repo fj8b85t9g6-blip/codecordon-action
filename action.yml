@@ -42,7 +42,8 @@ runs:
         fi
 
         CLI_DIR="$RUNNER_TEMP/codecordon-cli-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}"
-        npm install --prefix "$CLI_DIR" --no-save --ignore-scripts codecordon@0.2.0
+        npm install --prefix "$CLI_DIR" --no-save --ignore-scripts \
+          https://github.com/fj8b85t9g6-blip/codecordon-cli/releases/download/v0.2.1/codecordon-0.2.1.tgz
 
         CHANNEL_SHIM="$RUNNER_TEMP/codecordon-channel-${GITHUB_RUN_ID:-local}.cjs"
         printf '%s\n' \
