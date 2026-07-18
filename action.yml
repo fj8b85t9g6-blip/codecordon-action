@@ -1,0 +1,59 @@
+name: CodeCordon Security Gate
+description: Scan AI-generated applications for known security mistakes and fail CI on configured findings.
+author: Glenn Dinkins
+
+branding:
+  icon: shield
+  color: green
+
+inputs:
+  api-key:
+    description: CodeCordon Pro API key stored in a GitHub Actions secret.
+    required: true
+  target:
+    description: Directory to scan after checkout.
+    required: false
+    default: .
+  fail-on:
+    description: Lowest severity that fails the job (critical, high, medium, low, or none).
+    required: false
+    default: critical
+  min-score:
+    description: Minimum passing score from 0 to 100.
+    required: false
+    default: "60"
+
+runs:
+  using: composite
+  steps:
+    - name: Run CodeCordon security gate
+      shell: bash
+      env:
+        CODECORDON_API_KEY: ${{ inputs.api-key }}
+        CODECORDON_CHANNEL: github_action
+        SCAN_TARGET: ${{ inputs.target }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        MIN_SCORE: ${{ inputs.min-score }}
+      run: |
+        set -euo pipefail
+        if [[ ! -d "$SCAN_TARGET" ]]; then
+          echo "CodeCordon target is not a directory: $SCAN_TARGET" >&2
+          exit 2
+        fi
+
+        CLI_DIR="$RUNNER_TEMP/codecordon-cli-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}"
+        npm install --prefix "$CLI_DIR" --no-save --ignore-scripts codecordon@0.2.0
+
+        CHANNEL_SHIM="$RUNNER_TEMP/codecordon-channel-${GITHUB_RUN_ID:-local}.cjs"
+        printf '%s\n' \
+          'const originalFetch = globalThis.fetch;' \
+          'globalThis.fetch = (input, init = {}) => {' \
+          '  const headers = new Headers(init.headers);' \
+          '  headers.set("X-CodeCordon-Client", "github-action/1.0");' \
+          '  headers.set("X-CodeCordon-Channel", "github_action");' \
+          '  return originalFetch(input, { ...init, headers });' \
+          '};' > "$CHANNEL_SHIM"
+
+        NODE_OPTIONS="--require=$CHANNEL_SHIM ${NODE_OPTIONS:-}" \
+          node "$CLI_DIR/node_modules/codecordon/bin/codecordon.js" \
+          scan "$SCAN_TARGET" --fail-on "$FAIL_ON" --min-score "$MIN_SCORE"

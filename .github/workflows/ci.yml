@@ -1,0 +1,26 @@
+name: Verify action package
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify published CLI installation
+        shell: bash
+        run: |
+          set -euo pipefail
+          CLI_DIR="$RUNNER_TEMP/codecordon-cli"
+          npm install --prefix "$CLI_DIR" --no-save --ignore-scripts codecordon@0.2.0
+          test "$(node "$CLI_DIR/node_modules/codecordon/bin/codecordon.js" --version)" = "0.2.0"
